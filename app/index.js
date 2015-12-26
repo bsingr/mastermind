@@ -32,31 +32,30 @@ class Row extends React.Component {
     ReactDOM.render(
       <div>
         {previousAttempts.map((attempt, i) => {
-          return <div key={i}>
+          return <div className="attempt" key={i}>
             <Row tokens={attempt} />
             {hits(secret, attempt)}
             {nearbyHits(secret, attempt)}
-            <br />
           </div>
         })}
-        <br />
-        <Row tokens={currentAttempt} onClick={(token, i) => {
-          currentAttempt[i] = currentToken;
-          render();
-        }} />
-        <br />
-        <Row tokens={tokens} onClick={(token, i) => {
-          currentToken = token;
-          render();
-        }} />
-        <br />
-        <Token value={currentToken} />
-        <br />
-        <button onClick={() => {
-          previousAttempts.push(currentAttempt);
-          currentAttempt = pickRandomTokens(tokens, 4, false);
-          render();
-        }}>Bet</button>
+        <div className="current">
+          <Row tokens={currentAttempt} onClick={(token, i) => {
+            currentAttempt[i] = currentToken;
+            render();
+          }} />
+        </div>
+        <div className="source">
+          <Row tokens={tokens} onClick={(token, i) => {
+            currentToken = token;
+            render();
+          }} />
+          <Token value={currentToken} />
+          <button onClick={() => {
+            previousAttempts.push(currentAttempt);
+            currentAttempt = pickRandomTokens(tokens, 4, false);
+            render();
+          }}>Bet</button>
+        </div>
       </div>,
       document.getElementsByTagName('main')[0]
     );

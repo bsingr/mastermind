@@ -123,34 +123,37 @@
 	      previousAttempts.map(function (attempt, i) {
 	        return React.createElement(
 	          'div',
-	          { key: i },
+	          { className: 'attempt', key: i },
 	          React.createElement(Row, { tokens: attempt }),
 	          hits(secret, attempt),
-	          nearbyHits(secret, attempt),
-	          React.createElement('br', null)
+	          nearbyHits(secret, attempt)
 	        );
 	      }),
-	      React.createElement('br', null),
-	      React.createElement(Row, { tokens: currentAttempt, onClick: function onClick(token, i) {
-	          currentAttempt[i] = currentToken;
-	          render();
-	        } }),
-	      React.createElement('br', null),
-	      React.createElement(Row, { tokens: tokens, onClick: function onClick(token, i) {
-	          currentToken = token;
-	          render();
-	        } }),
-	      React.createElement('br', null),
-	      React.createElement(Token, { value: currentToken }),
-	      React.createElement('br', null),
 	      React.createElement(
-	        'button',
-	        { onClick: function onClick() {
-	            previousAttempts.push(currentAttempt);
-	            currentAttempt = pickRandomTokens(tokens, 4, false);
+	        'div',
+	        { className: 'current' },
+	        React.createElement(Row, { tokens: currentAttempt, onClick: function onClick(token, i) {
+	            currentAttempt[i] = currentToken;
 	            render();
-	          } },
-	        'Bet'
+	          } })
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'source' },
+	        React.createElement(Row, { tokens: tokens, onClick: function onClick(token, i) {
+	            currentToken = token;
+	            render();
+	          } }),
+	        React.createElement(Token, { value: currentToken }),
+	        React.createElement(
+	          'button',
+	          { onClick: function onClick() {
+	              previousAttempts.push(currentAttempt);
+	              currentAttempt = pickRandomTokens(tokens, 4, false);
+	              render();
+	            } },
+	          'Bet'
+	        )
 	      )
 	    ), document.getElementsByTagName('main')[0]);
 	  }
