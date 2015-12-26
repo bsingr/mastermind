@@ -4,21 +4,30 @@
     <meta charset="utf-8">
     <title>Mastermind</title>
     <style media="screen">
-
+      input[type=range] {
+        -webkit-appearance: none;
+        outline: none;
+      }
+      input[type=range][value~="0"] { background-color: red; }
+      input[type=range][value~="1"] { background-color: blue; }
+      input[type=range][value~="2"] { background-color: green; }
+      input[type=range][value~="3"] { background-color: yellow; }
+      input[type=range][value~="4"] { background-color: cyan; }
+      input[type=range][value~="5"] { background-color: magenta; }
     </style>
   </head>
   <body>
     <form class="js-secret">
-      <input name="0" type="range" min="0" max="5" />
-      <input name="1" type="range" min="0" max="5" />
-      <input name="2" type="range" min="0" max="5" />
-      <input name="3" type="range" min="0" max="5" />
+      <input class="js-sync-value-attr" name="0" type="range" min="0" max="5" />
+      <input class="js-sync-value-attr" name="1" type="range" min="0" max="5" />
+      <input class="js-sync-value-attr" name="2" type="range" min="0" max="5" />
+      <input class="js-sync-value-attr" name="3" type="range" min="0" max="5" />
     </form>
     <form class="js-attempt">
-      <input name="0" type="range" min="0" max="5" />
-      <input name="1" type="range" min="0" max="5" />
-      <input name="2" type="range" min="0" max="5" />
-      <input name="3" type="range" min="0" max="5" />
+      <input class="js-sync-value-attr" name="0" type="range" min="0" max="5" />
+      <input class="js-sync-value-attr" name="1" type="range" min="0" max="5" />
+      <input class="js-sync-value-attr" name="2" type="range" min="0" max="5" />
+      <input class="js-sync-value-attr" name="3" type="range" min="0" max="5" />
       <input type="submit" value="Play" />
       <span class="js-hits"></span>
       <span class="js-nearby-hits"></span>
@@ -28,10 +37,20 @@
 
       (function () {
         var tokens = [0,1,2,3,4,5];
-        var secret = createSecret(tokens, 4);
-        renderRow(document.getElementsByClassName('js-secret')[0], secret);
+        unserializeRow(document.getElementsByClassName('js-secret')[0], createTokens(tokens, 4));
+        unserializeRow(document.getElementsByClassName('js-attempt')[0], createTokens(tokens, 4));
         document.getElementsByClassName('js-attempt')[0].addEventListener('submit', attempt);
+        document.addEventListener('change', function (e) {
+          let className = e.target.getAttribute('class');
+          if (className.indexOf('js-sync-value-attr') > -1) {
+            syncValueAttr(e.target);
+          }
+        })
       })();
+
+      function syncValueAttr(that) {
+        that.setAttribute('value', that.value);
+      }
 
       function attempt(e) {
         e.preventDefault();
@@ -58,13 +77,15 @@
         return tokens;
       }
 
-      function renderRow(formEl, tokens) {
+      function unserializeRow(formEl, tokens) {
         tokens.forEach(function(token, i){
-          formEl.elements.namedItem(`${i}`).value = token;
+          const inputEl = formEl.elements.namedItem(`${i}`);
+          inputEl.value = token;
+          inputEl.setAttribute('value', token);
         });
       }
-      
-      function createSecret(tokens, size) {
+
+      function createTokens(tokens, size) {
         var secret = [];
         for (var i = 0; i < size; i++) {
           secret.push(Math.round(Math.random() * (tokens.length - 1)));
