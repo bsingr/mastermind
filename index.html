@@ -6,7 +6,16 @@
     <style media="screen">
       input[type=range] {
         -webkit-appearance: none;
+        width: 20%;
         outline: none;
+        margin: 0;
+        height: 30px;
+      }
+      input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        background-color: rgba(255, 255, 255, 0.8);
+        height: 30px;
+        width: 30px;
       }
       input[type=range][value~="0"] { background-color: red; }
       input[type=range][value~="1"] { background-color: blue; }
@@ -14,6 +23,7 @@
       input[type=range][value~="3"] { background-color: yellow; }
       input[type=range][value~="4"] { background-color: cyan; }
       input[type=range][value~="5"] { background-color: magenta; }
+      .js-secret input { display: none; }
     </style>
   </head>
   <body>
@@ -23,15 +33,17 @@
       <input class="js-sync-value-attr" name="2" type="range" min="0" max="5" />
       <input class="js-sync-value-attr" name="3" type="range" min="0" max="5" />
     </form>
-    <form class="js-attempt">
-      <input class="js-sync-value-attr" name="0" type="range" min="0" max="5" />
-      <input class="js-sync-value-attr" name="1" type="range" min="0" max="5" />
-      <input class="js-sync-value-attr" name="2" type="range" min="0" max="5" />
-      <input class="js-sync-value-attr" name="3" type="range" min="0" max="5" />
-      <input type="submit" value="Play" />
-      <span class="js-hits"></span>
-      <span class="js-nearby-hits"></span>
-    </form>
+    <div class="js-attempts">
+      <form class="js-attempt">
+        <input class="js-sync-value-attr" name="0" type="range" min="0" max="5" />
+        <input class="js-sync-value-attr" name="1" type="range" min="0" max="5" />
+        <input class="js-sync-value-attr" name="2" type="range" min="0" max="5" />
+        <input class="js-sync-value-attr" name="3" type="range" min="0" max="5" />
+        <input type="submit" value="Bet" />
+        <span class="js-hits"></span>
+        <span class="js-nearby-hits"></span>
+      </form>
+    </div>
     <script type="text/javascript">
       'use strict';
 
@@ -39,7 +51,7 @@
         var tokens = [0,1,2,3,4,5];
         unserializeRow(document.getElementsByClassName('js-secret')[0], createTokens(tokens, 4));
         unserializeRow(document.getElementsByClassName('js-attempt')[0], createTokens(tokens, 4));
-        document.getElementsByClassName('js-attempt')[0].addEventListener('submit', attempt);
+        document.addEventListener('submit', attempt);
         document.addEventListener('change', function (e) {
           let className = e.target.getAttribute('class');
           if (className.indexOf('js-sync-value-attr') > -1) {
@@ -54,12 +66,18 @@
 
       function attempt(e) {
         e.preventDefault();
+        var form = e.target;
+
+        var newAttempt = form.cloneNode();
+        newAttempt.innerHTML = form.innerHTML;
+        document.getElementsByClassName('js-attempts')[0].appendChild(newAttempt);
+
         var secret = serializeRow(document.getElementsByClassName('js-secret')[0]);
-        var attempt = serializeRow(this);
+        var attempt = serializeRow(form);
         var _hits = hits(secret, attempt);
         var _nearbyHits = nearbyHits(secret, attempt) - _hits;
-        this.getElementsByClassName('js-hits')[0].innerHTML = _hits;
-        this.getElementsByClassName('js-nearby-hits')[0].innerHTML = _nearbyHits;
+        form.getElementsByClassName('js-hits')[0].innerHTML = _hits;
+        form.getElementsByClassName('js-nearby-hits')[0].innerHTML = _nearbyHits;
       }
 
       function serializeRow(formEl) {
