@@ -51,34 +51,28 @@
         var tokens = [0,1,2,3,4,5];
         unserializeRow(document.getElementsByClassName('js-secret')[0], createTokens(tokens, 4));
         unserializeRow(document.getElementsByClassName('js-attempt')[0], createTokens(tokens, 4));
-        document.addEventListener('submit', attempt);
+        document.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var form = e.target;
+
+          var newAttempt = form.cloneNode();
+          newAttempt.innerHTML = form.innerHTML;
+          document.getElementsByClassName('js-attempts')[0].appendChild(newAttempt);
+
+          var secret = serializeRow(document.getElementsByClassName('js-secret')[0]);
+          var attempt = serializeRow(form);
+          var _hits = hits(secret, attempt);
+          var _nearbyHits = nearbyHits(secret, attempt) - _hits;
+          form.getElementsByClassName('js-hits')[0].innerHTML = _hits;
+          form.getElementsByClassName('js-nearby-hits')[0].innerHTML = _nearbyHits;
+        });
         document.addEventListener('change', function (e) {
           let className = e.target.getAttribute('class');
           if (className.indexOf('js-sync-value-attr') > -1) {
-            syncValueAttr(e.target);
+            e.target.setAttribute('value', e.target.value);
           }
         })
       })();
-
-      function syncValueAttr(that) {
-        that.setAttribute('value', that.value);
-      }
-
-      function attempt(e) {
-        e.preventDefault();
-        var form = e.target;
-
-        var newAttempt = form.cloneNode();
-        newAttempt.innerHTML = form.innerHTML;
-        document.getElementsByClassName('js-attempts')[0].appendChild(newAttempt);
-
-        var secret = serializeRow(document.getElementsByClassName('js-secret')[0]);
-        var attempt = serializeRow(form);
-        var _hits = hits(secret, attempt);
-        var _nearbyHits = nearbyHits(secret, attempt) - _hits;
-        form.getElementsByClassName('js-hits')[0].innerHTML = _hits;
-        form.getElementsByClassName('js-nearby-hits')[0].innerHTML = _nearbyHits;
-      }
 
       function serializeRow(formEl) {
         var i = 0;
