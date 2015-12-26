@@ -70,7 +70,7 @@
 	  _createClass(Token, [{
 	    key: 'render',
 	    value: function render() {
-	      var color = ['red', 'blue', 'yellow', 'cyan', 'blue', 'green', 'magenta'][this.props.value];
+	      var color = ['red', 'blue', 'yellow', 'cyan', 'black', 'green', 'magenta'][this.props.value];
 	      return React.createElement('div', { className: 'token', style: { backgroundColor: color }, onClick: this.props.onClick });
 	    }
 	  }]);
@@ -109,9 +109,9 @@
 	
 	(function () {
 	  var tokens = [0, 1, 2, 3, 4, 5];
-	  var secret = pickRandomTokens(tokens, 4);
+	  var secret = pickRandomTokens(tokens, 4, false);
 	  var previousAttempts = [];
-	  var currentAttempt = pickRandomTokens(tokens, 4);
+	  var currentAttempt = pickRandomTokens(tokens, 4, false);
 	  var currentToken = 0;
 	
 	  render();
@@ -120,8 +120,6 @@
 	    ReactDOM.render(React.createElement(
 	      'div',
 	      null,
-	      React.createElement(Row, { tokens: secret }),
-	      React.createElement('br', null),
 	      previousAttempts.map(function (attempt, i) {
 	        return React.createElement(
 	          'div',
@@ -149,7 +147,7 @@
 	        'button',
 	        { onClick: function onClick() {
 	            previousAttempts.push(currentAttempt);
-	            currentAttempt = pickRandomTokens(tokens, 4);
+	            currentAttempt = pickRandomTokens(tokens, 4, false);
 	            render();
 	          } },
 	        'Bet'
@@ -158,10 +156,18 @@
 	  }
 	})();
 	
-	function pickRandomTokens(tokens, numberOfTokens) {
+	function pickRandomTokens(_tokens, numberOfTokens, allowDuplicates) {
+	  var tokens = _tokens.slice(0);
 	  var pickedTokens = [];
 	  for (var i = 0; i < numberOfTokens; i++) {
-	    pickedTokens.push(Math.round(Math.random() * (tokens.length - 1)));
+	    var token = undefined;
+	    var random = Math.round(Math.random() * (tokens.length - 1));
+	    if (allowDuplicates) {
+	      token = random;
+	    } else {
+	      token = tokens.splice(random, 1)[0];
+	    }
+	    pickedTokens.push(token);
 	  }
 	  return pickedTokens;
 	}
