@@ -120,6 +120,11 @@
 	    ReactDOM.render(React.createElement(
 	      'div',
 	      null,
+	      React.createElement(
+	        'h1',
+	        null,
+	        'Previous'
+	      ),
 	      previousAttempts.map(function (attempt, i) {
 	        return React.createElement(
 	          'div',
@@ -132,19 +137,15 @@
 	      React.createElement(
 	        'div',
 	        { className: 'current' },
+	        React.createElement(
+	          'h1',
+	          null,
+	          'Current'
+	        ),
 	        React.createElement(Row, { tokens: currentAttempt, onClick: function onClick(token, i) {
 	            currentAttempt[i] = currentToken;
 	            render();
-	          } })
-	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'source' },
-	        React.createElement(Row, { tokens: tokens, onClick: function onClick(token, i) {
-	            currentToken = token;
-	            render();
 	          } }),
-	        React.createElement(Token, { value: currentToken }),
 	        React.createElement(
 	          'button',
 	          { onClick: function onClick() {
@@ -152,8 +153,27 @@
 	              currentAttempt = pickRandomTokens(tokens, 4, false);
 	              render();
 	            } },
-	          'Bet'
+	          'Try'
 	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'source' },
+	        React.createElement(
+	          'h1',
+	          null,
+	          'Available'
+	        ),
+	        React.createElement(Row, { tokens: tokens, onClick: function onClick(token, i) {
+	            currentToken = token;
+	            render();
+	          } }),
+	        React.createElement(
+	          'h1',
+	          null,
+	          'Picker'
+	        ),
+	        React.createElement(Token, { value: currentToken })
 	      )
 	    ), document.getElementsByTagName('main')[0]);
 	  }
