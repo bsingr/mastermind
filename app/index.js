@@ -6,23 +6,40 @@ const ReactDOM = require('react-dom');
 
 class Token extends React.Component {
   render() {
-    const color = ['red', 'blue', 'yellow', 'cyan', 'black', 'green', 'magenta'][this.props.value];
-    return <div className="token" style={{backgroundColor: color}} onClick={this.props.onClick}/>
+    let color;
+    if (this.props.value > -1) {
+      color = ['red', 'blue', 'yellow', 'cyan', 'black', 'green', 'magenta'][this.props.value];
+    } else {
+      color = 'gray';
+    }
+    return <div className="token" style={{
+      backgroundColor: color,
+      borderColor: this.props.isHighlighted ? 'white' : color
+    }} onClick={this.props.onClick}/>
   }
 }
 
 class Row extends React.Component {
   render() {
-    return <div className="row">{this.props.tokens.map((token, i) =>
-      <Token key={i} value={token} onClick={() => this.props.onClick ? this.props.onClick(token, i) : ''} />
-    )}</div>;
+    const { tokens, highlightToken } = this.props;
+    return <div className="row">{tokens.map((token, i) => {
+      return <Token key={i} isHighlighted={token === highlightToken} value={token} onClick={() => this.props.onClick ? this.props.onClick(token, i) : ''} />
+    })}</div>;
   }
 }
 
 (function () {
   var tokens = [0,1,2,3,4,5];
   var secret = pickRandomTokens(tokens, 4, false);
-  var previousAttempts = [];
+  var numberOfAttempts = 0;
+  var attempts = [
+    [-1, -1, -1, -1],
+    [-1, -1, -1, -1],
+    [-1, -1, -1, -1],
+    [-1, -1, -1, -1],
+    [-1, -1, -1, -1],
+    [-1, -1, -1, -1]
+  ];
   var currentAttempt = pickRandomTokens(tokens, 4, false);
   var currentToken = 0;
 
@@ -31,8 +48,7 @@ class Row extends React.Component {
   function render() {
     ReactDOM.render(
       <div>
-        <h1>Previous</h1>
-        {previousAttempts.map((attempt, i) => {
+        {attempts.map((attempt, i) => {
           return <div className="attempt" key={i}>
             <Row tokens={attempt} />
             {hits(secret, attempt)}
@@ -40,25 +56,22 @@ class Row extends React.Component {
           </div>
         })}
         <div className="current">
-          <h1>Current</h1>
           <Row tokens={currentAttempt} onClick={(token, i) => {
             currentAttempt[i] = currentToken;
             render();
           }} />
           <button onClick={() => {
-            previousAttempts.push(currentAttempt);
+            attempts.splice(numberOfAttempts, 1, currentAttempt);
             currentAttempt = pickRandomTokens(tokens, 4, false);
+            numberOfAttempts++;
             render();
           }}>Try</button>
         </div>
         <div className="source">
-          <h1>Available</h1>
-          <Row tokens={tokens} onClick={(token, i) => {
+          <Row tokens={tokens} highlightToken={currentToken} onClick={(token, i) => {
             currentToken = token;
             render();
           }} />
-          <h1>Picker</h1>
-          <Token value={currentToken} />
         </div>
       </div>,
       document.getElementsByTagName('main')[0]

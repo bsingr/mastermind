@@ -70,8 +70,16 @@
 	  _createClass(Token, [{
 	    key: 'render',
 	    value: function render() {
-	      var color = ['red', 'blue', 'yellow', 'cyan', 'black', 'green', 'magenta'][this.props.value];
-	      return React.createElement('div', { className: 'token', style: { backgroundColor: color }, onClick: this.props.onClick });
+	      var color = undefined;
+	      if (this.props.value > -1) {
+	        color = ['red', 'blue', 'yellow', 'cyan', 'black', 'green', 'magenta'][this.props.value];
+	      } else {
+	        color = 'gray';
+	      }
+	      return React.createElement('div', { className: 'token', style: {
+	          backgroundColor: color,
+	          borderColor: this.props.isHighlighted ? 'white' : color
+	        }, onClick: this.props.onClick });
 	    }
 	  }]);
 	
@@ -92,11 +100,15 @@
 	    value: function render() {
 	      var _this3 = this;
 	
+	      var _props = this.props;
+	      var tokens = _props.tokens;
+	      var highlightToken = _props.highlightToken;
+	
 	      return React.createElement(
 	        'div',
 	        { className: 'row' },
-	        this.props.tokens.map(function (token, i) {
-	          return React.createElement(Token, { key: i, value: token, onClick: function onClick() {
+	        tokens.map(function (token, i) {
+	          return React.createElement(Token, { key: i, isHighlighted: token === highlightToken, value: token, onClick: function onClick() {
 	              return _this3.props.onClick ? _this3.props.onClick(token, i) : '';
 	            } });
 	        })
@@ -110,7 +122,8 @@
 	(function () {
 	  var tokens = [0, 1, 2, 3, 4, 5];
 	  var secret = pickRandomTokens(tokens, 4, false);
-	  var previousAttempts = [];
+	  var numberOfAttempts = 0;
+	  var attempts = [[-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1]];
 	  var currentAttempt = pickRandomTokens(tokens, 4, false);
 	  var currentToken = 0;
 	
@@ -120,12 +133,7 @@
 	    ReactDOM.render(React.createElement(
 	      'div',
 	      null,
-	      React.createElement(
-	        'h1',
-	        null,
-	        'Previous'
-	      ),
-	      previousAttempts.map(function (attempt, i) {
+	      attempts.map(function (attempt, i) {
 	        return React.createElement(
 	          'div',
 	          { className: 'attempt', key: i },
@@ -137,11 +145,6 @@
 	      React.createElement(
 	        'div',
 	        { className: 'current' },
-	        React.createElement(
-	          'h1',
-	          null,
-	          'Current'
-	        ),
 	        React.createElement(Row, { tokens: currentAttempt, onClick: function onClick(token, i) {
 	            currentAttempt[i] = currentToken;
 	            render();
@@ -149,8 +152,9 @@
 	        React.createElement(
 	          'button',
 	          { onClick: function onClick() {
-	              previousAttempts.push(currentAttempt);
+	              attempts.splice(numberOfAttempts, 1, currentAttempt);
 	              currentAttempt = pickRandomTokens(tokens, 4, false);
+	              numberOfAttempts++;
 	              render();
 	            } },
 	          'Try'
@@ -159,21 +163,10 @@
 	      React.createElement(
 	        'div',
 	        { className: 'source' },
-	        React.createElement(
-	          'h1',
-	          null,
-	          'Available'
-	        ),
-	        React.createElement(Row, { tokens: tokens, onClick: function onClick(token, i) {
+	        React.createElement(Row, { tokens: tokens, highlightToken: currentToken, onClick: function onClick(token, i) {
 	            currentToken = token;
 	            render();
-	          } }),
-	        React.createElement(
-	          'h1',
-	          null,
-	          'Picker'
-	        ),
-	        React.createElement(Token, { value: currentToken })
+	          } })
 	      )
 	    ), document.getElementsByTagName('main')[0]);
 	  }
