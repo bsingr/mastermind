@@ -4,128 +4,18 @@
     <meta charset="utf-8">
     <title>Mastermind</title>
     <style media="screen">
-      input[type=range] {
-        -webkit-appearance: none;
-        width: 20%;
-        outline: none;
-        margin: 0;
-        height: 30px;
+      .row {
+        display: inline-block;
       }
-      input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        background-color: rgba(255, 255, 255, 0.8);
-        height: 30px;
+      .token {
+        display: inline-block;
         width: 30px;
+        height: 30px;
       }
-      input[type=range][value~="0"] { background-color: red; }
-      input[type=range][value~="1"] { background-color: blue; }
-      input[type=range][value~="2"] { background-color: green; }
-      input[type=range][value~="3"] { background-color: yellow; }
-      input[type=range][value~="4"] { background-color: cyan; }
-      input[type=range][value~="5"] { background-color: magenta; }
-      .js-secret input { display: none; }
     </style>
   </head>
   <body>
-    <form class="js-secret">
-      <input class="js-sync-value-attr" name="0" type="range" min="0" max="5" />
-      <input class="js-sync-value-attr" name="1" type="range" min="0" max="5" />
-      <input class="js-sync-value-attr" name="2" type="range" min="0" max="5" />
-      <input class="js-sync-value-attr" name="3" type="range" min="0" max="5" />
-    </form>
-    <div class="js-attempts">
-      <form class="js-attempt">
-        <input class="js-sync-value-attr" name="0" type="range" min="0" max="5" />
-        <input class="js-sync-value-attr" name="1" type="range" min="0" max="5" />
-        <input class="js-sync-value-attr" name="2" type="range" min="0" max="5" />
-        <input class="js-sync-value-attr" name="3" type="range" min="0" max="5" />
-        <input type="submit" value="Bet" />
-        <span class="js-hits"></span>
-        <span class="js-nearby-hits"></span>
-      </form>
-    </div>
-    <script type="text/javascript">
-      'use strict';
-
-      (function () {
-        var tokens = [0,1,2,3,4,5];
-        unserializeRow(document.getElementsByClassName('js-secret')[0], createTokens(tokens, 4));
-        unserializeRow(document.getElementsByClassName('js-attempt')[0], createTokens(tokens, 4));
-        document.addEventListener('submit', function (e) {
-          e.preventDefault();
-          var form = e.target;
-
-          var newAttempt = form.cloneNode();
-          newAttempt.innerHTML = form.innerHTML;
-          document.getElementsByClassName('js-attempts')[0].appendChild(newAttempt);
-
-          var secret = serializeRow(document.getElementsByClassName('js-secret')[0]);
-          var attempt = serializeRow(form);
-          var _hits = hits(secret, attempt);
-          var _nearbyHits = nearbyHits(secret, attempt) - _hits;
-          form.getElementsByClassName('js-hits')[0].innerHTML = _hits;
-          form.getElementsByClassName('js-nearby-hits')[0].innerHTML = _nearbyHits;
-        });
-        document.addEventListener('change', function (e) {
-          let className = e.target.getAttribute('class');
-          if (className.indexOf('js-sync-value-attr') > -1) {
-            e.target.setAttribute('value', e.target.value);
-          }
-        })
-      })();
-
-      function serializeRow(formEl) {
-        var i = 0;
-        var tokens = [];
-        while (true) {
-          let field = formEl.elements.namedItem(`${i}`);
-          if (field) {
-            tokens.push(parseInt(field.value, 10));
-            i++;
-          } else {
-            break;
-          }
-        }
-        return tokens;
-      }
-
-      function unserializeRow(formEl, tokens) {
-        tokens.forEach(function(token, i){
-          const inputEl = formEl.elements.namedItem(`${i}`);
-          inputEl.value = token;
-          inputEl.setAttribute('value', token);
-        });
-      }
-
-      function createTokens(tokens, size) {
-        var secret = [];
-        for (var i = 0; i < size; i++) {
-          secret.push(Math.round(Math.random() * (tokens.length - 1)));
-        }
-        return secret;
-      }
-
-      function hits(secret, attempt) {
-        var score = 0;
-        secret.forEach(function (token, i) {
-          if (attempt.indexOf(token) > -1 && attempt[i] === token) {
-            score++;
-          }
-        });
-        return score;
-      }
-
-      function nearbyHits(secret, attempt) {
-        var score = 0;
-        secret.forEach(function (token, i) {
-          var j = attempt.indexOf(token);
-          if (j > -1) {
-            attempt.splice(j, 1);
-            score++;
-          }
-        });
-        return score;
-      }
-    </script>
+    <main></main>
+    <script src="dist/app.js" charset="utf-8"></script>
   </body>
 </html>
