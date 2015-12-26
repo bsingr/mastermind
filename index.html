@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mastermind</title>
+    <style media="screen">
+
+    </style>
+  </head>
+  <body>
+    <form class="js-secret">
+      <input name="0" type="range" min="0" max="5" />
+      <input name="1" type="range" min="0" max="5" />
+      <input name="2" type="range" min="0" max="5" />
+      <input name="3" type="range" min="0" max="5" />
+    </form>
+    <form class="js-attempt">
+      <input name="0" type="range" min="0" max="5" />
+      <input name="1" type="range" min="0" max="5" />
+      <input name="2" type="range" min="0" max="5" />
+      <input name="3" type="range" min="0" max="5" />
+      <input type="submit" value="Play" />
+      <span class="js-hits"></span>
+      <span class="js-nearby-hits"></span>
+    </form>
+    <script type="text/javascript">
+      'use strict';
+
+      (function () {
+        var tokens = [0,1,2,3,4,5];
+        var secret = createSecret(tokens, 4);
+        renderRow(document.getElementsByClassName('js-secret')[0], secret);
+        document.getElementsByClassName('js-attempt')[0].addEventListener('submit', attempt);
+      })();
+
+      function attempt(e) {
+        e.preventDefault();
+        var secret = serializeRow(document.getElementsByClassName('js-secret')[0]);
+        var attempt = serializeRow(this);
+        var _hits = hits(secret, attempt);
+        var _nearbyHits = nearbyHits(secret, attempt) - _hits;
+        this.getElementsByClassName('js-hits')[0].innerHTML = _hits;
+        this.getElementsByClassName('js-nearby-hits')[0].innerHTML = _nearbyHits;
+      }
+
+      function serializeRow(formEl) {
+        var i = 0;
+        var tokens = [];
+        while (true) {
+          let field = formEl.elements.namedItem(`${i}`);
+          if (field) {
+            tokens.push(parseInt(field.value, 10));
+            i++;
+          } else {
+            break;
+          }
+        }
+        return tokens;
+      }
+
+      function renderRow(formEl, tokens) {
+        tokens.forEach(function(token, i){
+          formEl.elements.namedItem(`${i}`).value = token;
+        });
+      }
+      
+      function createSecret(tokens, size) {
+        var secret = [];
+        for (var i = 0; i < size; i++) {
+          secret.push(Math.round(Math.random() * (tokens.length - 1)));
+        }
+        return secret;
+      }
+
+      function hits(secret, attempt) {
+        var score = 0;
+        secret.forEach(function (token, i) {
+          if (attempt.indexOf(token) > -1 && attempt[i] === token) {
+            score++;
+          }
+        });
+        return score;
+      }
+
+      function nearbyHits(secret, attempt) {
+        var score = 0;
+        secret.forEach(function (token, i) {
+          var j = attempt.indexOf(token);
+          if (j > -1) {
+            attempt.splice(j, 1);
+            score++;
+          }
+        });
+        return score;
+      }
+    </script>
+  </body>
+</html>
