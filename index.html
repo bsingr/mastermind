@@ -7,45 +7,76 @@
       body {
         margin: 0;
       }
+      main,
+      div,
+      button {
+        height: 100%;
+      }
       .attempt {
         display: block;
+        width: 100%;
+        height: 12.5%;
       }
-      .row {
+      .attempt__row {
+        width: 80%;
         display: inline-block;
+        float: left;
       }
-      .token {
+      .attempt__token {
+        width: 25%;
         display: inline-block;
-        width: 24px;
-        height: 24px;
-        border: 8px dotted transparent;
+        float: left;
       }
-      .score {
-        width: 40px;
-        line-height: 40px;
-        height: 40px;
+      .attempt__score {
+        width: 10%;
         display: inline-block;
-        vertical-align: top;
-        text-align: center;
+        float: left;
+        position: relative;
         font-size: 25px;
         font-family: Courier;
+        text-align: center;
       }
-      button {
-        width: 80px;
-        line-height: 32px;
-        height: 40px;
+      .current {
+        height: 12.5%;
+        display: block;
+        width: 100%;
+      }
+      .current__row {
+        display: inline-block;
+        width: 80%;
+      }
+      .current__token {
+        display: inline-block;
+        width: 25%;
+      }
+      .current__solve {
+        width: 20%;
+        line-height: 100%;
         display: inline-block;
         vertical-align: top;
         font-size: 15px;
         font-family: Courier;
-        border: 4px solid white;
+        border: none;
       }
-      button:active {
+      .current__solve:active {
         background-color: #666;
+      }
+      .source__row {
+        height: 12.5%;
+        width: 100%;
+        display: block;
+      }
+      .source__token {
+        width: 16.66%;
+        display: inline-block;
+      }
+      .source__token.highlighted {
+        height: 90%;
       }
     </style>
   </head>
   <body>
     <main></main>
-    <script src="dist/app.1378997040196f6548fd.js" charset="utf-8"></script>
+    <script src="dist/app.21c3ba9b191847022111.js" charset="utf-8"></script>
   </body>
 </html>

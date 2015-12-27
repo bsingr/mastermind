@@ -12,23 +12,25 @@ class Token extends React.Component {
     } else {
       color = 'gray';
     }
-    return <div className="token" style={{
-      backgroundColor: color,
-      borderColor: this.props.isHighlighted ? 'white' : color
+    return <div className={`${this.props.classNamePrefix}token ${this.props.isHighlighted ? 'highlighted' : ''} `} style={{
+      backgroundColor: color
     }} onClick={this.props.onClick}/>
   }
 }
 
 class Row extends React.Component {
   render() {
-    const { tokens, highlightToken } = this.props;
-    return <div className="row">{tokens.map((token, i) => {
-      return <Token key={i} isHighlighted={token === highlightToken} value={token} onClick={() => this.props.onClick ? this.props.onClick(token, i) : ''} />
+    const { tokens, highlightToken, classNamePrefix } = this.props;
+    return <div className={`${classNamePrefix}row`}>{tokens.map((token, i) => {
+      return <Token key={i} classNamePrefix={classNamePrefix} isHighlighted={token === highlightToken} value={token} onClick={() => this.props.onClick ? this.props.onClick(token, i) : ''} />
     })}</div>;
   }
 }
 
 (function () {
+  const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  document.body.style.height = `${height - 4}px`;
+
   var tokens = [0,1,2,3,4,5];
   var secret = pickRandomTokens(tokens, 4, false);
   var numberOfAttempts = 0;
@@ -40,20 +42,26 @@ class Row extends React.Component {
 
   function render() {
     ReactDOM.render(
-      <div>
+      <div className="expand">
         {attempts.map((attempt, i) => {
           return <div className="attempt" key={i}>
-            <Row tokens={attempt} />
-            <span className="score" style={{color: numberOfAttempts > i ? 'red' : 'white'}}>{hits(secret, attempt)}</span>
-            <span className="score" style={{color: numberOfAttempts > i ? 'black' : 'white'}}>{nearbyHits(secret, attempt)}</span>
+            <Row classNamePrefix="attempt__" tokens={attempt} />
+            <div className="attempt__score"
+                 style={{color: isValidAttempt(attempt) ? 'red' : 'white'}}>
+              {hits(secret, attempt)}
+            </div>
+            <div className="attempt__score"
+                 style={{color: isValidAttempt(attempt) ? 'black' : 'white'}}>
+              {nearbyHits(secret, attempt)}
+            </div>
           </div>
         })}
         <div className="current">
-          <Row tokens={currentAttempt} onClick={(token, i) => {
+          <Row classNamePrefix="current__" tokens={currentAttempt} onClick={(token, i) => {
             currentAttempt[i] = currentToken;
             render();
           }} />
-          <button disabled={!isValidAttempt(currentAttempt)} onClick={() => {
+          <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={() => {
             if (isValidAttempt(currentAttempt)) {
               attempts.splice(numberOfAttempts, 1, currentAttempt);
               currentAttempt = currentAttempt.slice(0);
@@ -62,12 +70,10 @@ class Row extends React.Component {
             }
           }}>Solve</button>
         </div>
-        <div className="source">
-          <Row tokens={tokens} highlightToken={currentToken} onClick={(token, i) => {
-            currentToken = token;
-            render();
-          }} />
-        </div>
+        <Row classNamePrefix="source__" tokens={tokens} highlightToken={currentToken} onClick={(token, i) => {
+          currentToken = token;
+          render();
+        }} />
       </div>,
       document.getElementsByTagName('main')[0]
     );

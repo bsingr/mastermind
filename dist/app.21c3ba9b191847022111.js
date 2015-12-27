@@ -76,9 +76,8 @@
 	      } else {
 	        color = 'gray';
 	      }
-	      return React.createElement('div', { className: 'token', style: {
-	          backgroundColor: color,
-	          borderColor: this.props.isHighlighted ? 'white' : color
+	      return React.createElement('div', { className: this.props.classNamePrefix + 'token ' + (this.props.isHighlighted ? 'highlighted' : '') + ' ', style: {
+	          backgroundColor: color
 	        }, onClick: this.props.onClick });
 	    }
 	  }]);
@@ -103,12 +102,13 @@
 	      var _props = this.props;
 	      var tokens = _props.tokens;
 	      var highlightToken = _props.highlightToken;
+	      var classNamePrefix = _props.classNamePrefix;
 	
 	      return React.createElement(
 	        'div',
-	        { className: 'row' },
+	        { className: classNamePrefix + 'row' },
 	        tokens.map(function (token, i) {
-	          return React.createElement(Token, { key: i, isHighlighted: token === highlightToken, value: token, onClick: function onClick() {
+	          return React.createElement(Token, { key: i, classNamePrefix: classNamePrefix, isHighlighted: token === highlightToken, value: token, onClick: function onClick() {
 	              return _this3.props.onClick ? _this3.props.onClick(token, i) : '';
 	            } });
 	        })
@@ -120,6 +120,9 @@
 	})(React.Component);
 	
 	(function () {
+	  var height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+	  document.body.style.height = height - 4 + 'px';
+	
 	  var tokens = [0, 1, 2, 3, 4, 5];
 	  var secret = pickRandomTokens(tokens, 4, false);
 	  var numberOfAttempts = 0;
@@ -134,48 +137,60 @@
 	  function render() {
 	    ReactDOM.render(React.createElement(
 	      'div',
-	      null,
+	      { className: 'expand' },
 	      attempts.map(function (attempt, i) {
 	        return React.createElement(
 	          'div',
 	          { className: 'attempt', key: i },
-	          React.createElement(Row, { tokens: attempt }),
-	          hits(secret, attempt),
-	          nearbyHits(secret, attempt)
+	          React.createElement(Row, { classNamePrefix: 'attempt__', tokens: attempt }),
+	          React.createElement(
+	            'div',
+	            { className: 'attempt__score',
+	              style: { color: isValidAttempt(attempt) ? 'red' : 'white' } },
+	            hits(secret, attempt)
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'attempt__score',
+	              style: { color: isValidAttempt(attempt) ? 'black' : 'white' } },
+	            nearbyHits(secret, attempt)
+	          )
 	        );
 	      }),
 	      React.createElement(
 	        'div',
 	        { className: 'current' },
-	        React.createElement(Row, { tokens: currentAttempt, onClick: function onClick(token, i) {
+	        React.createElement(Row, { classNamePrefix: 'current__', tokens: currentAttempt, onClick: function onClick(token, i) {
 	            currentAttempt[i] = currentToken;
 	            render();
 	          } }),
 	        React.createElement(
 	          'button',
-	          { onClick: function onClick() {
-	              attempts.splice(numberOfAttempts, 1, currentAttempt);
-	              currentAttempt = currentAttempt.slice(0);
-	              numberOfAttempts++;
-	              render();
+	          { className: 'current__solve', disabled: !isValidAttempt(currentAttempt), onClick: function onClick() {
+	              if (isValidAttempt(currentAttempt)) {
+	                attempts.splice(numberOfAttempts, 1, currentAttempt);
+	                currentAttempt = currentAttempt.slice(0);
+	                numberOfAttempts++;
+	                render();
+	              }
 	            } },
-	          'Try'
+	          'Solve'
 	        )
 	      ),
-	      React.createElement(
-	        'div',
-	        { className: 'source' },
-	        React.createElement(Row, { tokens: tokens, highlightToken: currentToken, onClick: function onClick(token, i) {
-	            currentToken = token;
-	            render();
-	          } })
-	      )
+	      React.createElement(Row, { classNamePrefix: 'source__', tokens: tokens, highlightToken: currentToken, onClick: function onClick(token, i) {
+	          currentToken = token;
+	          render();
+	        } })
 	    ), document.getElementsByTagName('main')[0]);
 	  }
 	})();
 	
 	function newAttempt() {
 	  return [-1, -1, -1, -1];
+	}
+	
+	function isValidAttempt(attempt) {
+	  return attempt.indexOf(-1) === -1;
 	}
 	
 	function pickRandomTokens(_tokens, numberOfTokens, allowDuplicates) {
@@ -19806,4 +19821,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.e560b9569c01b0315856.js.map
+//# sourceMappingURL=app.21c3ba9b191847022111.js.map
