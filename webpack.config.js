@@ -25,8 +25,8 @@ var config = {
   },
   plugins: [
     function() {
-       this.plugin("compile", function() {
-         require( 'child_process' ).exec('rm -rf ./dist');
+       this.plugin("emit", function(compilation, callback) {
+         require( 'child_process' ).exec('rm -rf ./dist/*', (err, stdout, stderr) => callback());
        });
        this.plugin("done", function(stats) {
          const hash = stats.toJson().hash;
