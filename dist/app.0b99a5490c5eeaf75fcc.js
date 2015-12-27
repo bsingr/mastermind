@@ -156,7 +156,7 @@
 	            nearbyHits(secret, attempt)
 	          )
 	        );
-	      }).reverse(),
+	      }),
 	      React.createElement(
 	        'div',
 	        { className: 'current' },
@@ -168,7 +168,8 @@
 	          'button',
 	          { className: 'current__solve', disabled: !isValidAttempt(currentAttempt), onClick: function onClick() {
 	              if (isValidAttempt(currentAttempt)) {
-	                attempts.splice(numberOfAttempts, 1, currentAttempt);
+	                attempts.push(currentAttempt);
+	                attempts.shift();
 	                currentAttempt = currentAttempt.slice(0);
 	                numberOfAttempts++;
 	                render();
@@ -19821,4 +19822,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.e16218e29b792692f6aa.js.map
+//# sourceMappingURL=app.0b99a5490c5eeaf75fcc.js.map

@@ -62,7 +62,7 @@ class Row extends React.Component {
               {nearbyHits(secret, attempt)}
             </div>
           </div>
-        }).reverse()}
+        })}
         <div className="current">
           <Row classNamePrefix="current__" tokens={currentAttempt} onClick={(token, i) => {
             currentAttempt[i] = currentToken;
@@ -70,7 +70,8 @@ class Row extends React.Component {
           }} />
           <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={() => {
             if (isValidAttempt(currentAttempt)) {
-              attempts.splice(numberOfAttempts, 1, currentAttempt);
+              attempts.push(currentAttempt);
+              attempts.shift();
               currentAttempt = currentAttempt.slice(0);
               numberOfAttempts++;
               render();
