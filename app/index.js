@@ -38,8 +38,6 @@ class Row extends React.Component {
   const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
   document.body.style.height = `${height - 4}px`;
 
-  alert('Hello Tester');
-
   var tokens = [0,1,2,3,4,5];
   var secret = pickRandomTokens(tokens, 4, false);
   var numberOfAttempts = 0;
@@ -73,11 +71,12 @@ class Row extends React.Component {
           <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={() => {
             if (isValidAttempt(currentAttempt)) {
               if (hits(secret, currentAttempt) == 4) {
-                let wins = parseInt(localStorage.getItem('wins'), 10) || 0;
-                wins++;
-                localStorage.setItem('wins', wins);
-                alert(`You won the ${wins} time!`);
-                window.location.reload();
+                // let wins = parseInt(localStorage.getItem('wins'), 10) || 0;
+                // wins++;
+                // localStorage.setItem('wins', wins);
+                // alert(`You won the ${wins} time!`);
+                // window.location.reload();
+                alert('You won! Congratulations!');
               }
               attempts.push(currentAttempt);
               attempts.shift();
