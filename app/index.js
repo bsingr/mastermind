@@ -53,11 +53,13 @@ class Row extends React.Component {
             currentAttempt[i] = currentToken;
             render();
           }} />
-          <button onClick={() => {
-            attempts.splice(numberOfAttempts, 1, currentAttempt);
-            currentAttempt = currentAttempt.slice(0);
-            numberOfAttempts++;
-            render();
+          <button disabled={!isValidAttempt(currentAttempt)} onClick={() => {
+            if (isValidAttempt(currentAttempt)) {
+              attempts.splice(numberOfAttempts, 1, currentAttempt);
+              currentAttempt = currentAttempt.slice(0);
+              numberOfAttempts++;
+              render();
+            }
           }}>Try</button>
         </div>
         <div className="source">
@@ -74,6 +76,10 @@ class Row extends React.Component {
 
 function newAttempt() {
   return [-1, -1, -1, -1]
+}
+
+function isValidAttempt(attempt) {
+  return attempt.indexOf(-1) === -1;
 }
 
 function pickRandomTokens(_tokens, numberOfTokens, allowDuplicates) {
