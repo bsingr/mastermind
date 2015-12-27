@@ -32,15 +32,8 @@ class Row extends React.Component {
   var tokens = [0,1,2,3,4,5];
   var secret = pickRandomTokens(tokens, 4, false);
   var numberOfAttempts = 0;
-  var attempts = [
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1]
-  ];
-  var currentAttempt = pickRandomTokens(tokens, 4, false);
+  var attempts = Array.apply(null, {length: 6}).map(() => newAttempt());
+  var currentAttempt = newAttempt();
   var currentToken = 0;
 
   render();
@@ -62,7 +55,7 @@ class Row extends React.Component {
           }} />
           <button onClick={() => {
             attempts.splice(numberOfAttempts, 1, currentAttempt);
-            currentAttempt = pickRandomTokens(tokens, 4, false);
+            currentAttempt = currentAttempt.slice(0);
             numberOfAttempts++;
             render();
           }}>Try</button>
@@ -78,6 +71,10 @@ class Row extends React.Component {
     );
   }
 })();
+
+function newAttempt() {
+  return [-1, -1, -1, -1]
+}
 
 function pickRandomTokens(_tokens, numberOfTokens, allowDuplicates) {
   var tokens = _tokens.slice(0);

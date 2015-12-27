@@ -123,8 +123,10 @@
 	  var tokens = [0, 1, 2, 3, 4, 5];
 	  var secret = pickRandomTokens(tokens, 4, false);
 	  var numberOfAttempts = 0;
-	  var attempts = [[-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1]];
-	  var currentAttempt = pickRandomTokens(tokens, 4, false);
+	  var attempts = Array.apply(null, { length: 6 }).map(function () {
+	    return newAttempt();
+	  });
+	  var currentAttempt = newAttempt();
 	  var currentToken = 0;
 	
 	  render();
@@ -153,7 +155,7 @@
 	          'button',
 	          { onClick: function onClick() {
 	              attempts.splice(numberOfAttempts, 1, currentAttempt);
-	              currentAttempt = pickRandomTokens(tokens, 4, false);
+	              currentAttempt = currentAttempt.slice(0);
 	              numberOfAttempts++;
 	              render();
 	            } },
@@ -171,6 +173,10 @@
 	    ), document.getElementsByTagName('main')[0]);
 	  }
 	})();
+	
+	function newAttempt() {
+	  return [-1, -1, -1, -1];
+	}
 	
 	function pickRandomTokens(_tokens, numberOfTokens, allowDuplicates) {
 	  var tokens = _tokens.slice(0);
@@ -19800,4 +19806,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.fb9aa9c220e34e276a9d.js.map
+//# sourceMappingURL=app.e560b9569c01b0315856.js.map
