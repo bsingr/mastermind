@@ -38,6 +38,8 @@ class Row extends React.Component {
   const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
   document.body.style.height = `${height - 4}px`;
 
+  alert('Hello Tester');
+
   var tokens = [0,1,2,3,4,5];
   var secret = pickRandomTokens(tokens, 4, false);
   var numberOfAttempts = 0;
