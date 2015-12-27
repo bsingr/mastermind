@@ -156,7 +156,7 @@
 	            nearbyHits(secret, attempt)
 	          )
 	        );
-	      }),
+	      }).reverse(),
 	      React.createElement(
 	        'div',
 	        { className: 'current' },
@@ -19821,4 +19821,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.21c3ba9b191847022111.js.map
+//# sourceMappingURL=app.33bb8175b9edb94d88f1.js.map

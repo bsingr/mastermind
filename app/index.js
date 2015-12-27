@@ -55,7 +55,7 @@ class Row extends React.Component {
               {nearbyHits(secret, attempt)}
             </div>
           </div>
-        })}
+        }).reverse()}
         <div className="current">
           <Row classNamePrefix="current__" tokens={currentAttempt} onClick={(token, i) => {
             currentAttempt[i] = currentToken;
