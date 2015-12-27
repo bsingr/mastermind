@@ -168,6 +168,12 @@
 	          'button',
 	          { className: 'current__solve', disabled: !isValidAttempt(currentAttempt), onClick: function onClick() {
 	              if (isValidAttempt(currentAttempt)) {
+	                if (hits(currentAttempt) === 4) {
+	                  var wins = parseInt(localStorage.getItem('wins'), 10) || 0;
+	                  wins++;
+	                  localStorage.setItem('wins', wins);
+	                  alert('You won the ${wins} time!');
+	                }
 	                attempts.push(currentAttempt);
 	                attempts.shift();
 	                currentAttempt = currentAttempt.slice(0);
@@ -19822,4 +19828,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.0b99a5490c5eeaf75fcc.js.map
+//# sourceMappingURL=app.8a538e87cceeb8464726.js.map

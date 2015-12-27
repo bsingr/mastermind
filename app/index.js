@@ -70,6 +70,12 @@ class Row extends React.Component {
           }} />
           <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={() => {
             if (isValidAttempt(currentAttempt)) {
+              if (hits(currentAttempt) === 4) {
+                let wins = parseInt(localStorage.getItem('wins'), 10) || 0;
+                wins++;
+                localStorage.setItem('wins', wins);
+                alert('You won the ${wins} time!');
+              }
               attempts.push(currentAttempt);
               attempts.shift();
               currentAttempt = currentAttempt.slice(0);
