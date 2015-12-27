@@ -25,6 +25,9 @@ var config = {
   },
   plugins: [
     function() {
+       this.plugin("compile", function() {
+         require( 'child_process' ).exec('rm -rf ./dist');
+       });
        this.plugin("done", function(stats) {
          const hash = stats.toJson().hash;
          fs.readFile('./index.html', 'utf8', function (err,data) {
