@@ -44,8 +44,8 @@ class Row extends React.Component {
         {attempts.map((attempt, i) => {
           return <div className="attempt" key={i}>
             <Row tokens={attempt} />
-            {hits(secret, attempt)}
-            {nearbyHits(secret, attempt)}
+            <span className="score" style={{color: numberOfAttempts > i ? 'red' : 'white'}}>{hits(secret, attempt)}</span>
+            <span className="score" style={{color: numberOfAttempts > i ? 'black' : 'white'}}>{nearbyHits(secret, attempt)}</span>
           </div>
         })}
         <div className="current">
