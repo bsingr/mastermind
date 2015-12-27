@@ -1,14 +1,14 @@
 var webpack = require('webpack');
-
-var appName = 'app';
-var outputFile = appName + '.js';
+var fs = require('fs');
 
 var config = {
-  entry: './app/index.js',
+  entry: {
+    'app': './app/index.js'
+  },
   devtool: 'source-map',
   output: {
     path: __dirname + '/dist',
-    filename: outputFile,
+    filename: `[name].[hash].js`,
     publicPath: __dirname + '/dist'
   },
   module: {
@@ -22,7 +22,23 @@ var config = {
         }
       }
     ]
-  }
+  },
+  plugins: [
+    function() {
+       this.plugin("done", function(stats) {
+         const hash = stats.toJson().hash;
+         fs.readFile('./index.html', 'utf8', function (err,data) {
+           if (err) {
+             return console.log('ERR', err);
+           }
+           var result = data.replace(/dist\/app.*.js/g, `dist/app.${hash}.js`);
+           fs.writeFile('./index.html', result, 'utf8', function (err) {
+              if (err) return console.log('ERR', err);
+           });
+         });
+       });
+    }
+  ]
 };
 
 module.exports = config;
