@@ -72,7 +72,7 @@
 	    value: function render() {
 	      var color = undefined;
 	      if (this.props.value > -1) {
-	        color = ['red', 'blue', 'yellow', 'cyan', 'black', 'green', 'magenta'][this.props.value];
+	        color = ['rgb(167, 0, 50)', 'rgb(33, 130, 200)', 'rgb(242, 203, 0)', 'rgb(67, 177, 0)', 'rgb(32, 32, 32)', 'rgb(191, 18, 136)'][this.props.value];
 	      } else {
 	        color = 'gray';
 	      }
@@ -19821,4 +19821,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.33bb8175b9edb94d88f1.js.map
+//# sourceMappingURL=app.e16218e29b792692f6aa.js.map
