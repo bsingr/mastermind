@@ -60,7 +60,7 @@ class Row extends React.Component {
               numberOfAttempts++;
               render();
             }
-          }}>Try</button>
+          }}>Solve</button>
         </div>
         <div className="source">
           <Row tokens={tokens} highlightToken={currentToken} onClick={(token, i) => {
