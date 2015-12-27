@@ -168,7 +168,7 @@
 	          'button',
 	          { className: 'current__solve', disabled: !isValidAttempt(currentAttempt), onClick: function onClick() {
 	              if (isValidAttempt(currentAttempt)) {
-	                if (hits(currentAttempt) === 4) {
+	                if (hits(secret, currentAttempt) === 4) {
 	                  var wins = parseInt(localStorage.getItem('wins'), 10) || 0;
 	                  wins++;
 	                  localStorage.setItem('wins', wins);
@@ -19828,4 +19828,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.8a538e87cceeb8464726.js.map
+//# sourceMappingURL=app.e9def4a30802580a2e83.js.map
