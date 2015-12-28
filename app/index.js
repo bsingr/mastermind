@@ -71,12 +71,15 @@ class Row extends React.Component {
           <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={() => {
             if (isValidAttempt(currentAttempt)) {
               if (hits(secret, currentAttempt) == 4) {
-                // let wins = parseInt(localStorage.getItem('wins'), 10) || 0;
-                // wins++;
-                // localStorage.setItem('wins', wins);
-                // alert(`You won the ${wins} time!`);
-                // window.location.reload();
-                alert('You won! Congratulations!');
+                if (typeof(localStorage) !== "undefined") {
+                  let wins = parseInt(localStorage.getItem('wins'), 10) || 0;
+                  wins++;
+                  localStorage.setItem('wins', wins);
+                  alert(`You won the ${wins} time!`);
+                  window.location.reload();
+                } else {
+                  alert('You won! Congratulations!');
+                }
               }
               attempts.push(currentAttempt);
               attempts.shift();
