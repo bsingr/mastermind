@@ -3,41 +3,89 @@
 
 const React = require('react');
 const ReactDOM = require('react-dom');
+const {DragSource, DropTarget, DragDropContext, DragLayer} = require('react-dnd');
+const TouchBackend = require('react-dnd-touch-backend').default;
+const HTML5Backend = require('react-dnd-html5-backend').default;
 
-class Token extends React.Component {
-  render() {
-    let color;
-    if (this.props.value > -1) {
-      color = [
-        'rgb(167, 0, 50)',
-        'rgb(33, 130, 200)',
-        'rgb(242, 203, 0)',
-        'rgb(67, 177, 0)',
-        'rgb(32, 32, 32)',
-        'rgb(191, 18, 136)',
-      ][this.props.value];
-    } else {
-      color = 'gray';
-    }
-    return <div className={`${this.props.classNamePrefix}token ${this.props.isHighlighted ? 'highlighted' : ''} `} style={{
-      backgroundColor: color
-    }} onClick={this.props.onClick}/>
+var tokenTarget = {
+  canDrop: function (props) {
+    return true;
+  },
+  drop: function (props, monitor) {
+    props.changeCurrentAttempt(monitor.getItem().value, props.idx);
+  }
+};
+
+const tokenSource = {
+  beginDrag: function (props) {
+    return {value: props.value};
+  }
+};
+
+function collectDrag(connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging()
   }
 }
+
+function collectDrop(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    canDrop: monitor.canDrop(),
+    isOver: monitor.isOver()
+  };
+}
+
+function Token(props) {
+  let color;
+  if (props.value > -1) {
+    color = [
+      'rgb(167, 0, 50)',
+      'rgb(33, 130, 200)',
+      'rgb(242, 203, 0)',
+      'rgb(67, 177, 0)',
+      'rgb(32, 32, 32)',
+      'rgb(191, 18, 136)',
+    ][props.value];
+  } else {
+    color = 'gray';
+  }
+  return <div className={`${props.classNamePrefix}token`} style={{
+    backgroundColor: color
+  }} />
+}
+
+const DragToken = DragSource('token', tokenSource, collectDrag)(props =>
+  props.connectDragSource(Token(props))
+)
+
+const DropToken = DropTarget('token', tokenTarget, collectDrop)(props =>
+  props.connectDropTarget(Token(props))
+)
 
 class Row extends React.Component {
   render() {
     const { tokens, highlightToken, classNamePrefix } = this.props;
     return <div className={`${classNamePrefix}row`}>{tokens.map((token, i) => {
-      return <Token key={i} classNamePrefix={classNamePrefix} isHighlighted={token === highlightToken} value={token} onClick={() => this.props.onClick ? this.props.onClick(token, i) : ''} />
+      return <DragToken key={i} idx={i} classNamePrefix={classNamePrefix} isHighlighted={token === highlightToken} value={token} />
     })}</div>;
   }
 }
 
-class App extends React.Component {
+class DropRow extends React.Component {
   render() {
-    const {tokens, secret, numberOfAttempts, attempts, currentAttempt, currentToken} = this.props;
-    const {changeCurrentAttempt, changeCurrentToken, solve} = this.props;
+    const { tokens, highlightToken, classNamePrefix } = this.props;
+    return <div className={`${classNamePrefix}row`}>{tokens.map((token, i) => {
+      return <DropToken key={i} idx={i} classNamePrefix={classNamePrefix} isHighlighted={token === highlightToken} value={token} changeCurrentAttempt={this.props.changeCurrentAttempt} />
+    })}</div>;
+  }
+}
+
+class RawApp extends React.Component {
+  render() {
+    const {tokens, secret, numberOfAttempts, attempts, currentAttempt} = this.props;
+    const {changeCurrentAttempt, solve} = this.props;
     return <div className="expand">
       {attempts.map((attempt, i) => {
         return <div className="attempt" key={i}>
@@ -53,13 +101,15 @@ class App extends React.Component {
         </div>
       })}
       <div className="current">
-        <Row classNamePrefix="current__" tokens={currentAttempt} onClick={changeCurrentAttempt} />
+        <DropRow classNamePrefix="current__" tokens={currentAttempt} changeCurrentAttempt={changeCurrentAttempt} />
         <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={solve}>Solve</button>
       </div>
-      <Row classNamePrefix="source__" tokens={tokens} highlightToken={currentToken} onClick={changeCurrentToken} />
+      <Row classNamePrefix="source__" tokens={tokens} />
     </div>;
   }
 }
+
+const App = DragDropContext(HTML5Backend)(RawApp);
 
 (function () {
   const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -73,13 +123,8 @@ class App extends React.Component {
     numberOfAttempts: 0,
     attempts: Array.apply(null, {length: 6}).map(() => newAttempt()),
     currentAttempt: newAttempt(),
-    currentToken: 0,
     changeCurrentAttempt: (token, i) => {
-      props.currentAttempt[i] = props.currentToken;
-      render();
-    },
-    changeCurrentToken: (token, i) => {
-      props.currentToken = token;
+      props.currentAttempt[i] = token;
       render();
     },
     solve: () => {
