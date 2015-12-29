@@ -34,66 +34,81 @@ class Row extends React.Component {
   }
 }
 
+class App extends React.Component {
+  render() {
+    const {tokens, secret, numberOfAttempts, attempts, currentAttempt, currentToken} = this.props;
+    const {changeCurrentAttempt, changeCurrentToken, solve} = this.props;
+    return <div className="expand">
+      {attempts.map((attempt, i) => {
+        return <div className="attempt" key={i}>
+          <Row classNamePrefix="attempt__" tokens={attempt} />
+          <div className="attempt__score"
+               style={{color: isValidAttempt(attempt) ? 'red' : 'white'}}>
+            {hits(secret, attempt)}
+          </div>
+          <div className="attempt__score"
+               style={{color: isValidAttempt(attempt) ? 'black' : 'white'}}>
+            {nearbyHits(secret, attempt)}
+          </div>
+        </div>
+      })}
+      <div className="current">
+        <Row classNamePrefix="current__" tokens={currentAttempt} onClick={changeCurrentAttempt} />
+        <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={solve}>Solve</button>
+      </div>
+      <Row classNamePrefix="source__" tokens={tokens} highlightToken={currentToken} onClick={changeCurrentToken} />
+    </div>;
+  }
+}
+
 (function () {
   const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
   document.body.style.height = `${height - 4}px`;
 
-  var tokens = [0,1,2,3,4,5];
-  var secret = pickRandomTokens(tokens, 4, false);
-  var numberOfAttempts = 0;
-  var attempts = Array.apply(null, {length: 6}).map(() => newAttempt());
-  var currentAttempt = newAttempt();
-  var currentToken = 0;
+  const tokens = [0,1,2,3,4,5];
+
+  const props = {
+    tokens: tokens,
+    secret: pickRandomTokens(tokens, 4, false),
+    numberOfAttempts: 0,
+    attempts: Array.apply(null, {length: 6}).map(() => newAttempt()),
+    currentAttempt: newAttempt(),
+    currentToken: 0,
+    changeCurrentAttempt: (token, i) => {
+      props.currentAttempt[i] = props.currentToken;
+      render();
+    },
+    changeCurrentToken: (token, i) => {
+      props.currentToken = token;
+      render();
+    },
+    solve: () => {
+      if (isValidAttempt(props.currentAttempt)) {
+        if (hits(props.secret, props.currentAttempt) == 4) {
+          if (typeof(localStorage) !== "undefined") {
+            let wins = parseInt(localStorage.getItem('wins'), 10) || 0;
+            wins++;
+            localStorage.setItem('wins', wins);
+            alert(`You won the ${wins} time!`);
+            window.location.reload();
+          } else {
+            alert('You won! Congratulations!');
+          }
+        }
+        props.attempts.push(props.currentAttempt);
+        props.attempts.shift();
+        props.currentAttempt = props.currentAttempt.slice(0);
+        props.numberOfAttempts++;
+        render();
+      }
+    }
+  };
 
   render();
 
   function render() {
     ReactDOM.render(
-      <div className="expand">
-        {attempts.map((attempt, i) => {
-          return <div className="attempt" key={i}>
-            <Row classNamePrefix="attempt__" tokens={attempt} />
-            <div className="attempt__score"
-                 style={{color: isValidAttempt(attempt) ? 'red' : 'white'}}>
-              {hits(secret, attempt)}
-            </div>
-            <div className="attempt__score"
-                 style={{color: isValidAttempt(attempt) ? 'black' : 'white'}}>
-              {nearbyHits(secret, attempt)}
-            </div>
-          </div>
-        })}
-        <div className="current">
-          <Row classNamePrefix="current__" tokens={currentAttempt} onClick={(token, i) => {
-            currentAttempt[i] = currentToken;
-            render();
-          }} />
-          <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={() => {
-            if (isValidAttempt(currentAttempt)) {
-              if (hits(secret, currentAttempt) == 4) {
-                if (typeof(localStorage) !== "undefined") {
-                  let wins = parseInt(localStorage.getItem('wins'), 10) || 0;
-                  wins++;
-                  localStorage.setItem('wins', wins);
-                  alert(`You won the ${wins} time!`);
-                  window.location.reload();
-                } else {
-                  alert('You won! Congratulations!');
-                }
-              }
-              attempts.push(currentAttempt);
-              attempts.shift();
-              currentAttempt = currentAttempt.slice(0);
-              numberOfAttempts++;
-              render();
-            }
-          }}>Solve</button>
-        </div>
-        <Row classNamePrefix="source__" tokens={tokens} highlightToken={currentToken} onClick={(token, i) => {
-          currentToken = token;
-          render();
-        }} />
-      </div>,
+      <App {...props} />,
       document.getElementsByTagName('main')[0]
     );
   }
