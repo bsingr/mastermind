@@ -5,7 +5,6 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const {DragSource, DropTarget, DragDropContext, DragLayer} = require('react-dnd');
 const TouchBackend = require('react-dnd-touch-backend').default;
-const HTML5Backend = require('react-dnd-html5-backend').default;
 
 var tokenTarget = {
   canDrop: function (props) {
@@ -109,7 +108,7 @@ class RawApp extends React.Component {
   }
 }
 
-const App = DragDropContext(HTML5Backend)(RawApp);
+const App = DragDropContext(TouchBackend({enableMouseEvents: true}))(RawApp);
 
 (function () {
   const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);

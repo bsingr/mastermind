@@ -19,7 +19,6 @@
   "homepage": "https://github.com/bsingr/mastermind#readme",
   "dependencies": {
     "react-dnd": "^2.0.2",
-    "react-dnd-html5-backend": "^2.0.2",
     "react-dnd-touch-backend": "^0.2.4"
   },
   "devDependencies": {
