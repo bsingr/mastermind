@@ -84,8 +84,8 @@ class PreviewToken extends React.Component {
     }
     return <div style={{
       position: 'absolute',
-      top: offset.y,
-      left: offset.x
+      top: offset.y - 30,
+      left: offset.x - 30
     }}><Token value={value} classNamePrefix="preview__" /></div>;
   }
 }
@@ -111,9 +111,20 @@ class DropRow extends React.Component {
 }
 
 class RawApp extends React.Component {
+  componentDidUpdate() {
+    if (this.props.success) {
+      this.refs.audio.play();
+    }
+  }
   render() {
-    const {tokens, secret, numberOfAttempts, attempts, currentAttempt} = this.props;
+    const {tokens, secret, numberOfAttempts, attempts, currentAttempt, success, success_audio_src} = this.props;
     const {changeCurrentAttempt, solve} = this.props;
+    let badge;
+    if (success) {
+      badge = <div className="badge" onClick={() => confirm('Again?') && window.location.reload()}>
+        <br/><br/>Win!
+      </div>;
+    }
     return <div className="expand">
       {attempts.map((attempt, i) => {
         return <div className="attempt" key={i}>
@@ -134,55 +145,60 @@ class RawApp extends React.Component {
       </div>
       <Row classNamePrefix="source__" tokens={tokens} />
       <DragPreviewToken />
+      <audio autoPlay={false} ref="audio">
+        <source src={success_audio_src} type="audio/aac" />
+      </audio>
+      {badge}
     </div>;
   }
 }
 
 const App = DragDropContext(TouchBackend({enableMouseEvents: true}))(RawApp);
 
-(function () {
-  const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-  document.body.style.height = `${height - 4}px`;
-
+function initialState(bindAction) {
   const tokens = [0,1,2,3,4,5];
-
-  const props = {
+  return {
     tokens: tokens,
     secret: pickRandomTokens(tokens, 4, false),
     numberOfAttempts: 0,
     attempts: Array.apply(null, {length: 6}).map(() => newAttempt()),
     currentAttempt: newAttempt(),
-    changeCurrentAttempt: (token, i) => {
-      props.currentAttempt[i] = token;
-      render();
-    },
-    solve: () => {
-      if (isValidAttempt(props.currentAttempt)) {
-        if (hits(props.secret, props.currentAttempt) == 4) {
-          if (typeof(localStorage) !== "undefined") {
-            let wins = parseInt(localStorage.getItem('wins'), 10) || 0;
-            wins++;
-            localStorage.setItem('wins', wins);
-            alert(`You won the ${wins} time!`);
-            window.location.reload();
-          } else {
-            alert('You won! Congratulations!');
-          }
+    success: false,
+    success_audio_src: `audio/success_${Math.round(Math.random())}.aac`,
+    changeCurrentAttempt: bindAction(update => getState => (token, i) => {
+      getState().currentAttempt[i] = token;
+      update();
+    }),
+    solve: bindAction(update => getState => () => {
+      const state = getState();
+      if (isValidAttempt(state.currentAttempt)) {
+        if (hits(state.secret, state.currentAttempt) == 4) {
+          state.success = true;
         }
-        props.attempts.push(props.currentAttempt);
-        props.attempts.shift();
-        props.currentAttempt = props.currentAttempt.slice(0);
-        props.numberOfAttempts++;
-        render();
+        state.attempts.push(state.currentAttempt);
+        state.attempts.shift();
+        state.currentAttempt = state.currentAttempt.slice(0);
+        state.numberOfAttempts++;
+        update();
       }
-    }
+    })
   };
+}
+
+
+(function () {
+  const height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  document.body.style.height = `${height - 4}px`;
+
+  const state = initialState((action) => {
+    return action(render)(() => state)
+  })
 
   render();
 
   function render() {
     ReactDOM.render(
-      <App {...props} />,
+      <App {...state} />,
       document.getElementsByTagName('main')[0]
     );
   }

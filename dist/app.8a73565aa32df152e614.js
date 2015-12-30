@@ -155,8 +155,8 @@
 	        'div',
 	        { style: {
 	            position: 'absolute',
-	            top: offset.y,
-	            left: offset.x
+	            top: offset.y - 30,
+	            left: offset.x - 30
 	          } },
 	        React.createElement(Token, { value: value, classNamePrefix: 'preview__' })
 	      );
@@ -240,6 +240,13 @@
 	  }
 	
 	  _createClass(RawApp, [{
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate() {
+	      if (this.props.success) {
+	        this.refs.audio.play();
+	      }
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _props4 = this.props;
@@ -248,10 +255,24 @@
 	      var numberOfAttempts = _props4.numberOfAttempts;
 	      var attempts = _props4.attempts;
 	      var currentAttempt = _props4.currentAttempt;
+	      var success = _props4.success;
+	      var success_audio_src = _props4.success_audio_src;
 	      var _props5 = this.props;
 	      var changeCurrentAttempt = _props5.changeCurrentAttempt;
 	      var solve = _props5.solve;
 	
+	      var badge = undefined;
+	      if (success) {
+	        badge = React.createElement(
+	          'div',
+	          { className: 'badge', onClick: function onClick() {
+	              return confirm('Again?') && window.location.reload();
+	            } },
+	          React.createElement('br', null),
+	          React.createElement('br', null),
+	          'Win!'
+	        );
+	      }
 	      return React.createElement(
 	        'div',
 	        { className: 'expand' },
@@ -285,7 +306,13 @@
 	          )
 	        ),
 	        React.createElement(Row, { classNamePrefix: 'source__', tokens: tokens }),
-	        React.createElement(DragPreviewToken, null)
+	        React.createElement(DragPreviewToken, null),
+	        React.createElement(
+	          'audio',
+	          { autoPlay: false, ref: 'audio' },
+	          React.createElement('source', { src: success_audio_src, type: 'audio/aac' })
+	        ),
+	        badge
 	      );
 	    }
 	  }]);
@@ -295,13 +322,9 @@
 	
 	var App = DragDropContext(TouchBackend({ enableMouseEvents: true }))(RawApp);
 	
-	(function () {
-	  var height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-	  document.body.style.height = height - 4 + 'px';
-	
+	function initialState(bindAction) {
 	  var tokens = [0, 1, 2, 3, 4, 5];
-	
-	  var props = {
+	  return {
 	    tokens: tokens,
 	    secret: pickRandomTokens(tokens, 4, false),
 	    numberOfAttempts: 0,
@@ -309,36 +332,50 @@
 	      return newAttempt();
 	    }),
 	    currentAttempt: newAttempt(),
-	    changeCurrentAttempt: function changeCurrentAttempt(token, i) {
-	      props.currentAttempt[i] = token;
-	      render();
-	    },
-	    solve: function solve() {
-	      if (isValidAttempt(props.currentAttempt)) {
-	        if (hits(props.secret, props.currentAttempt) == 4) {
-	          if (typeof localStorage !== "undefined") {
-	            var wins = parseInt(localStorage.getItem('wins'), 10) || 0;
-	            wins++;
-	            localStorage.setItem('wins', wins);
-	            alert('You won the ' + wins + ' time!');
-	            window.location.reload();
-	          } else {
-	            alert('You won! Congratulations!');
+	    success: false,
+	    success_audio_src: 'audio/success_' + Math.round(Math.random()) + '.aac',
+	    changeCurrentAttempt: bindAction(function (update) {
+	      return function (getState) {
+	        return function (token, i) {
+	          getState().currentAttempt[i] = token;
+	          update();
+	        };
+	      };
+	    }),
+	    solve: bindAction(function (update) {
+	      return function (getState) {
+	        return function () {
+	          var state = getState();
+	          if (isValidAttempt(state.currentAttempt)) {
+	            if (hits(state.secret, state.currentAttempt) == 4) {
+	              state.success = true;
+	            }
+	            state.attempts.push(state.currentAttempt);
+	            state.attempts.shift();
+	            state.currentAttempt = state.currentAttempt.slice(0);
+	            state.numberOfAttempts++;
+	            update();
 	          }
-	        }
-	        props.attempts.push(props.currentAttempt);
-	        props.attempts.shift();
-	        props.currentAttempt = props.currentAttempt.slice(0);
-	        props.numberOfAttempts++;
-	        render();
-	      }
-	    }
+	        };
+	      };
+	    })
 	  };
+	}
+	
+	(function () {
+	  var height = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+	  document.body.style.height = height - 4 + 'px';
+	
+	  var state = initialState(function (action) {
+	    return action(render)(function () {
+	      return state;
+	    });
+	  });
 	
 	  render();
 	
 	  function render() {
-	    ReactDOM.render(React.createElement(App, props), document.getElementsByTagName('main')[0]);
+	    ReactDOM.render(React.createElement(App, state), document.getElementsByTagName('main')[0]);
 	  }
 	})();
 	
@@ -24700,4 +24737,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.8088438ce3174dd5e97d.js.map
+//# sourceMappingURL=app.8a73565aa32df152e614.js.map
