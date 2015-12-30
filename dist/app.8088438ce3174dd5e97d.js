@@ -82,6 +82,14 @@
 	  }
 	};
 	
+	function collectDragPreview(monitor) {
+	  return {
+	    isDragging: monitor.isDragging(),
+	    item: monitor.getItem(),
+	    position: monitor.getClientOffset()
+	  };
+	}
+	
 	function collectDrag(connect, monitor) {
 	  return {
 	    connectDragSource: connect.dragSource(),
@@ -117,8 +125,51 @@
 	  return props.connectDropTarget(Token(props));
 	});
 	
-	var Row = (function (_React$Component) {
-	  _inherits(Row, _React$Component);
+	var PreviewToken = (function (_React$Component) {
+	  _inherits(PreviewToken, _React$Component);
+	
+	  function PreviewToken() {
+	    _classCallCheck(this, PreviewToken);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(PreviewToken).apply(this, arguments));
+	  }
+	
+	  _createClass(PreviewToken, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props;
+	      var isDragging = _props.isDragging;
+	      var item = _props.item;
+	      var position = _props.position;
+	
+	      var value = undefined,
+	          offset = undefined;
+	      if (isDragging && position) {
+	        value = this.props.item.value;
+	        offset = position;
+	      } else {
+	        value = "";
+	        offset = { x: 0, y: 0 };
+	      }
+	      return React.createElement(
+	        'div',
+	        { style: {
+	            position: 'absolute',
+	            top: offset.y,
+	            left: offset.x
+	          } },
+	        React.createElement(Token, { value: value, classNamePrefix: 'preview__' })
+	      );
+	    }
+	  }]);
+	
+	  return PreviewToken;
+	})(React.Component);
+	
+	var DragPreviewToken = DragLayer(collectDragPreview)(PreviewToken);
+	
+	var Row = (function (_React$Component2) {
+	  _inherits(Row, _React$Component2);
 	
 	  function Row() {
 	    _classCallCheck(this, Row);
@@ -129,10 +180,10 @@
 	  _createClass(Row, [{
 	    key: 'render',
 	    value: function render() {
-	      var _props = this.props;
-	      var tokens = _props.tokens;
-	      var highlightToken = _props.highlightToken;
-	      var classNamePrefix = _props.classNamePrefix;
+	      var _props2 = this.props;
+	      var tokens = _props2.tokens;
+	      var highlightToken = _props2.highlightToken;
+	      var classNamePrefix = _props2.classNamePrefix;
 	
 	      return React.createElement(
 	        'div',
@@ -147,8 +198,8 @@
 	  return Row;
 	})(React.Component);
 	
-	var DropRow = (function (_React$Component2) {
-	  _inherits(DropRow, _React$Component2);
+	var DropRow = (function (_React$Component3) {
+	  _inherits(DropRow, _React$Component3);
 	
 	  function DropRow() {
 	    _classCallCheck(this, DropRow);
@@ -159,18 +210,18 @@
 	  _createClass(DropRow, [{
 	    key: 'render',
 	    value: function render() {
-	      var _this3 = this;
+	      var _this4 = this;
 	
-	      var _props2 = this.props;
-	      var tokens = _props2.tokens;
-	      var highlightToken = _props2.highlightToken;
-	      var classNamePrefix = _props2.classNamePrefix;
+	      var _props3 = this.props;
+	      var tokens = _props3.tokens;
+	      var highlightToken = _props3.highlightToken;
+	      var classNamePrefix = _props3.classNamePrefix;
 	
 	      return React.createElement(
 	        'div',
 	        { className: classNamePrefix + 'row' },
 	        tokens.map(function (token, i) {
-	          return React.createElement(DropToken, { key: i, idx: i, classNamePrefix: classNamePrefix, isHighlighted: token === highlightToken, value: token, changeCurrentAttempt: _this3.props.changeCurrentAttempt });
+	          return React.createElement(DropToken, { key: i, idx: i, classNamePrefix: classNamePrefix, isHighlighted: token === highlightToken, value: token, changeCurrentAttempt: _this4.props.changeCurrentAttempt });
 	        })
 	      );
 	    }
@@ -179,8 +230,8 @@
 	  return DropRow;
 	})(React.Component);
 	
-	var RawApp = (function (_React$Component3) {
-	  _inherits(RawApp, _React$Component3);
+	var RawApp = (function (_React$Component4) {
+	  _inherits(RawApp, _React$Component4);
 	
 	  function RawApp() {
 	    _classCallCheck(this, RawApp);
@@ -191,15 +242,15 @@
 	  _createClass(RawApp, [{
 	    key: 'render',
 	    value: function render() {
-	      var _props3 = this.props;
-	      var tokens = _props3.tokens;
-	      var secret = _props3.secret;
-	      var numberOfAttempts = _props3.numberOfAttempts;
-	      var attempts = _props3.attempts;
-	      var currentAttempt = _props3.currentAttempt;
 	      var _props4 = this.props;
-	      var changeCurrentAttempt = _props4.changeCurrentAttempt;
-	      var solve = _props4.solve;
+	      var tokens = _props4.tokens;
+	      var secret = _props4.secret;
+	      var numberOfAttempts = _props4.numberOfAttempts;
+	      var attempts = _props4.attempts;
+	      var currentAttempt = _props4.currentAttempt;
+	      var _props5 = this.props;
+	      var changeCurrentAttempt = _props5.changeCurrentAttempt;
+	      var solve = _props5.solve;
 	
 	      return React.createElement(
 	        'div',
@@ -233,7 +284,8 @@
 	            'Solve'
 	          )
 	        ),
-	        React.createElement(Row, { classNamePrefix: 'source__', tokens: tokens })
+	        React.createElement(Row, { classNamePrefix: 'source__', tokens: tokens }),
+	        React.createElement(DragPreviewToken, null)
 	      );
 	    }
 	  }]);
@@ -24648,4 +24700,4 @@
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=app.91645fbf3a9f1979632d.js.map
+//# sourceMappingURL=app.8088438ce3174dd5e97d.js.map

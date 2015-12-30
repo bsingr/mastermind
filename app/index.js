@@ -21,6 +21,14 @@ const tokenSource = {
   }
 };
 
+function collectDragPreview(monitor) {
+  return {
+    isDragging: monitor.isDragging(),
+    item: monitor.getItem(),
+    position: monitor.getClientOffset()
+  };
+}
+
 function collectDrag(connect, monitor) {
   return {
     connectDragSource: connect.dragSource(),
@@ -63,6 +71,27 @@ const DropToken = DropTarget('token', tokenTarget, collectDrop)(props =>
   props.connectDropTarget(Token(props))
 )
 
+class PreviewToken extends React.Component {
+  render() {
+    const {isDragging, item, position} = this.props;
+    let value, offset;
+    if (isDragging && position) {
+      value = this.props.item.value;
+      offset = position;
+    } else {
+      value = "";
+      offset = {x: 0, y: 0}
+    }
+    return <div style={{
+      position: 'absolute',
+      top: offset.y,
+      left: offset.x
+    }}><Token value={value} classNamePrefix="preview__" /></div>;
+  }
+}
+
+const DragPreviewToken = DragLayer(collectDragPreview)(PreviewToken);
+
 class Row extends React.Component {
   render() {
     const { tokens, highlightToken, classNamePrefix } = this.props;
@@ -104,6 +133,7 @@ class RawApp extends React.Component {
         <button className="current__solve" disabled={!isValidAttempt(currentAttempt)} onClick={solve}>Solve</button>
       </div>
       <Row classNamePrefix="source__" tokens={tokens} />
+      <DragPreviewToken />
     </div>;
   }
 }
